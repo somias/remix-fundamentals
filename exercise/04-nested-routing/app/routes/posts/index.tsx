@@ -26,6 +26,11 @@ export default function Posts() {
           </li>
         ))}
       </ul>
+      <div className="mt-24">
+        <Link className="text-xl text-orange-400 underline" to="dashboard">
+          Dashboard
+        </Link>
+      </div>
     </main>
   );
 }
