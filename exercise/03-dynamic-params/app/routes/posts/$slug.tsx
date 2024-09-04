@@ -2,14 +2,14 @@ import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { marked } from "marked";
+import invariant from "tiny-invariant";
 import { getPost } from "~/models/post.server";
 
 export async function loader({ params }: LoaderArgs) {
   const slug = params.slug;
-  if (!slug) throw new Error("Missing slug");
+  invariant(slug, "Missing slug");
   const post = await getPost(slug);
-  if (!post) throw new Error("Post not found");
-
+  invariant(post, "Post not found");
   return json(post);
 }
 
