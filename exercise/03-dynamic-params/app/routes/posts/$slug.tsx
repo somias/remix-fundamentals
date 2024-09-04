@@ -10,15 +10,17 @@ export async function loader({ params }: LoaderArgs) {
   invariant(slug, "Missing slug");
   const post = await getPost(slug);
   invariant(post, "Post not found");
-  return json(post);
+
+  const html = marked(post.markdown);
+  return json({ post, html });
 }
 
 export default function PostSlug() {
-  const post = useLoaderData<typeof loader>();
+  const { post, html } = useLoaderData<typeof loader>();
   return (
     <main className="mx-auto max-w-4xl">
       <h1 className="my-6 border-b-2 text-center text-3xl">{post.title}</h1>
-      <div dangerouslySetInnerHTML={{ __html: marked(post.markdown) }} />
+      <div dangerouslySetInnerHTML={{ __html: html }} />
     </main>
   );
 }
