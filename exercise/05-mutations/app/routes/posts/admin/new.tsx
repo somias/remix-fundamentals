@@ -9,6 +9,7 @@ import type { LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { createPost } from "~/models/post.server";
 import { Form, useActionData } from "@remix-run/react";
+import invariant from "tiny-invariant";
 
 export async function action({ request }: LoaderArgs) {
   const formData = await request.formData();
@@ -26,6 +27,10 @@ export async function action({ request }: LoaderArgs) {
   if (hasErrors) {
     return json({ errors });
   }
+
+  invariant(typeof title === "string", "title must be a string");
+  invariant(typeof slug === "string", "slug must be a string");
+  invariant(typeof markdown === "string", "markdown must be a string");
 
   await createPost({ title, slug, markdown });
   return redirect("/posts/admin");
