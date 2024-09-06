@@ -13,31 +13,28 @@ import { Form, useActionData } from "@remix-run/react";
 export async function action({ request }: LoaderArgs) {
   const formData = await request.formData();
   const title = formData.get("title");
-
-  if (typeof title !== "string" || !title) {
-    return json({ title: "Title is required" });
-  }
-
   const slug = formData.get("slug");
-
-  if (typeof slug !== "string" || !slug) {
-    return json({ slug: "Slug is required" });
-  }
-
   const markdown = formData.get("markdown");
 
-  if (typeof markdown !== "string" || !markdown) {
-    return json({ markdown: "Markdown is required" });
+  const errors = {
+    title: title ? null : "Title is required",
+    slug: slug ? null : "Slug is required",
+    markdown: markdown ? null : "Markdown is required",
+  };
+
+  const hasErrors = Object.values(errors).some(Boolean);
+  if (hasErrors) {
+    return json({ errors });
   }
 
-  await createPost(title, slug, markdown);
+  await createPost({ title, slug, markdown });
   return redirect("/posts/admin");
 }
 
 const inputClassName = `w-full rounded border border-gray-500 px-2 py-1 text-lg`;
 
 export default function NewPost() {
-  const errors = useActionData<typeof action>();
+  const actionData = useActionData<typeof action>();
 
   return (
     <Form method="post">
@@ -45,8 +42,8 @@ export default function NewPost() {
         <label>
           Post Title:{" "}
           <input type="text" name="title" className={inputClassName} />
-          {errors?.title ? (
-            <em className="text-red-600">{errors.title}</em>
+          {actionData?.errors?.title ? (
+            <em className="text-red-600">{actionData.errors.title}</em>
           ) : null}
         </label>
       </p>
@@ -54,8 +51,8 @@ export default function NewPost() {
         <label>
           Post Slug:{" "}
           <input type="text" name="slug" className={inputClassName} />
-          {errors?.slug ? (
-            <em className="text-red-600">{errors.slug}</em>
+          {actionData?.errors?.slug ? (
+            <em className="text-red-600">{actionData.errors.slug}</em>
           ) : null}
         </label>
       </p>
@@ -68,8 +65,8 @@ export default function NewPost() {
           name="markdown"
           className={`${inputClassName} font-mono`}
         />
-        {errors?.markdown ? (
-          <em className="text-red-600">{errors.markdown}</em>
+        {actionData?.errors?.markdown ? (
+          <em className="text-red-600">{actionData.errors.markdown}</em>
         ) : null}
       </p>
       <p className="text-right">
