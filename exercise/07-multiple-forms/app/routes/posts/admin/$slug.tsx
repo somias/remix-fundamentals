@@ -32,6 +32,7 @@ export async function action({ request, params }: ActionArgs) {
   const formData = await request.formData();
   // 🐨 grab the "intent" from the form data
   const intent = formData.get("intent");
+  invariant(typeof params.slug === "string", "slug not provided")
 
   // 🐨 if the intent is "delete" then delete the post
   // and redirect to "/posts/admin"
@@ -41,7 +42,7 @@ export async function action({ request, params }: ActionArgs) {
   }
 
   const title = formData.get("title");
-  const slug = formData.get("slug");
+  const slug = formData.get("slug") ?? params.slug
   const markdown = formData.get("markdown");
 
   const errors = {
@@ -81,11 +82,10 @@ export default function PostAdmin() {
   // the "intent" in the form data.
   // 💰 transition.submission?.formData.get("intent")
   const intent = transition.submission?.formData.get("intent");
-  const isCreating = Boolean(transition.submission);
-  const submission = Boolean(transition.submission);
+  const isCreating = Boolean(intent === "create");
   // 🐨 create an isUpdating and isDeleting variable based on the transition
-  const isUpdating = intent === "update";
-  const isDeleting = intent === "delete";
+  const isUpdating = Boolean(intent === "update");
+  const isDeleting = Boolean(intent === "delete");
   // 🐨 create an isNewPost variable based on whether there's a post on `data`.
   const isNewPost = !data?.post;
 
@@ -152,18 +152,21 @@ export default function PostAdmin() {
             value="delete"
             className="rounded bg-red-500 py-2 px-4 text-white hover:bg-red-600 focus:bg-red-400 disabled:bg-red-300"
           >
-            {isDeleting && submission ? "Deleting..." : "Delete post"}
+            {isDeleting ? "Deleting..." : "Delete post"}
           </button>
         ) : null}
         <button
           type="submit"
           // 🐨 add a name of "intent" and a value of "create" if this is a new post or "update" if it's an existing post
+          name="intent"
+          value={isNewPost ? "create" : "update"}
           className="rounded bg-blue-500 py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400 disabled:bg-blue-300"
           // 🐨 this should be disabled if we're creating *or* updating
-          disabled={isCreating}
+          disabled={isCreating || isUpdating}
         >
           {/* 🐨 if this is a new post then this works fine as-is, but if we're updating it should say "Updating..." / "Update" */}
-          {isCreating ? "Creating..." : "Create Post"}
+          {isNewPost ? (isCreating ? "Creating..." : "Create Post") : null}
+          {!isNewPost ? (isUpdating ? "Updating..." : "Update Post") : null}
         </button>
       </p>
     </Form>
