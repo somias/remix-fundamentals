@@ -22,10 +22,7 @@ import { requireAdminUser } from "~/session.server";
 // 🐨 get the request
 export async function loader({ request, params }: LoaderArgs) {
   // 🐨 call requireAdminUser from session.server with the request
-  const userIsAllowed = await requireAdminUser(request);
-  if (!userIsAllowed) {
-    throw redirect("/login");
-  }
+  await requireAdminUser(request);
 
   invariant(params.slug, "slug not found");
   if (params.slug === "new") {

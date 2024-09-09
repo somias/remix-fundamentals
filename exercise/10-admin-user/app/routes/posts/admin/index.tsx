@@ -6,10 +6,7 @@ import { requireAdminUser } from "~/session.server";
 // 🐨 call requireAdminUser from session.server with the request
 // 💰 return json({}) (you must return a response)
 export async function loader({ request }: LoaderArgs) {
-  const userIsAllowed = await requireAdminUser(request);
-  if (!userIsAllowed) {
-    throw redirect("/login");
-  }
+  await requireAdminUser(request);
 
   return json({});
 }

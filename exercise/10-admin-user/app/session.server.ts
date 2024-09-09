@@ -69,11 +69,11 @@ export async function requireUser(request: Request) {
 // 4. If they're the same, return the user
 export async function requireAdminUser(request: Request) {
   const user = await requireUser(request);
-  if (user.email === ENV.ADMIN_EMAIL) {
-    return user;
-  } else {
+  if (user.email !== ENV.ADMIN_EMAIL) {
     throw await logout(request);
   }
+
+  return user;
 }
 
 export async function createUserSession({

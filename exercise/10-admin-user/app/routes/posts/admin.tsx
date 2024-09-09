@@ -7,10 +7,8 @@ import { requireAdminUser } from "~/session.server";
 // 🐨 get the request from the loader
 export async function loader({ request }: LoaderArgs) {
   // 🐨 call requireAdminUser from session.server with the request
-  const userIsAllowed = await requireAdminUser(request);
-  if (!userIsAllowed) {
-    throw redirect("/login");
-  }
+  await requireAdminUser(request);
+
   return json({ posts: await getPostListItems() });
 }
 
