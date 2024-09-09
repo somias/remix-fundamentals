@@ -4,14 +4,20 @@ import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { getPostListItems } from "~/models/post.server";
 
 export async function loader() {
-  return json({ posts: await getPostListItems() });
+  return json({
+    posts: await getPostListItems(),
+    env: process.env,
+  });
 }
 
 export default function PostAdmin() {
-  const { posts } = useLoaderData<typeof loader>();
+  const { posts, env } = useLoaderData<typeof loader>();
   return (
     <div className="mx-auto max-w-4xl">
       <h1 className="my-6 mb-2 border-b-2 text-center text-3xl">Blog Admin</h1>
+      <h1 className="my-6 mb-2 border-b-2 text-center text-3xl">
+        .env: {env.ADMIN_EMAIL}
+      </h1>
       <div className="grid grid-cols-4 gap-6">
         <nav className="col-span-4 md:col-span-1">
           <ul>
