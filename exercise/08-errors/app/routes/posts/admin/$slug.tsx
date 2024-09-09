@@ -7,6 +7,7 @@ import {
   useTransition,
 } from "@remix-run/react";
 import invariant from "tiny-invariant";
+import { ErrorFallback } from "~/components";
 
 import {
   createPost,
@@ -16,6 +17,7 @@ import {
 } from "~/models/post.server";
 
 export async function loader({ params }: LoaderArgs) {
+  blah();
   invariant(params.slug, "slug not found");
   if (params.slug === "new") {
     return json({ post: null });
@@ -154,3 +156,10 @@ export default function PostAdmin() {
 
 // 🐨 Add an ErrorBoundary component to this
 // 💰 You can use the ErrorFallback component from "~/components"
+export function ErrorBoundary({ error }: { error: Error }) {
+  console.error(error);
+
+  return (
+    <ErrorFallback>An unexpected error occurred: {error.message}</ErrorFallback>
+  );
+}
