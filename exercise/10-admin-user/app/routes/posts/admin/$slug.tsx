@@ -38,6 +38,8 @@ export async function loader({ request, params }: LoaderArgs) {
 
 export async function action({ request, params }: ActionArgs) {
   // 🐨 call requireAdminUser from session.server with the request
+  await requireAdminUser(request);
+
   const formData = await request.formData();
   const intent = formData.get("intent");
   invariant(typeof params.slug === "string", "slug not provided");
