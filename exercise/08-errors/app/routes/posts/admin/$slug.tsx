@@ -3,7 +3,9 @@ import { json, redirect } from "@remix-run/node";
 import {
   Form,
   useActionData,
+  useCatch,
   useLoaderData,
+  useParams,
   useTransition,
 } from "@remix-run/react";
 import invariant from "tiny-invariant";
@@ -17,14 +19,17 @@ import {
 } from "~/models/post.server";
 
 export async function loader({ params }: LoaderArgs) {
-  blah();
   invariant(params.slug, "slug not found");
   if (params.slug === "new") {
     return json({ post: null });
   }
 
   const post = await getPost(params.slug);
-  invariant(post, `Post not found: ${params.slug}`);
+
+  if (!post) {
+    throw new Response("not found", { status: 404 });
+  }
+
   return json({ post });
 }
 
@@ -162,4 +167,19 @@ export function ErrorBoundary({ error }: { error: Error }) {
   return (
     <ErrorFallback>An unexpected error occurred: {error.message}</ErrorFallback>
   );
+}
+
+export function CatchBoundary() {
+  const caught = useCatch();
+  const params = useParams();
+
+  if (caught.status === 404) {
+    return (
+      <ErrorFallback>
+        No posts found with the slu: "{params.slug}"
+      </ErrorFallback>
+    );
+  }
+
+  throw new Error(`Unhandled reponse with status: ${caught.status}`);
 }
