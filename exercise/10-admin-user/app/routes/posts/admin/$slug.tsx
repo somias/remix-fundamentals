@@ -17,10 +17,16 @@ import {
   getPost,
   updatePost,
 } from "~/models/post.server";
+import { requireAdminUser } from "~/session.server";
 
 // 🐨 get the request
-export async function loader({ params }: LoaderArgs) {
+export async function loader({ request, params }: LoaderArgs) {
   // 🐨 call requireAdminUser from session.server with the request
+  const userIsAllowed = await requireAdminUser(request);
+  if (!userIsAllowed) {
+    throw redirect("/login");
+  }
+
   invariant(params.slug, "slug not found");
   if (params.slug === "new") {
     return json({ post: null });
